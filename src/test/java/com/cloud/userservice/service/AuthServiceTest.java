@@ -5,7 +5,7 @@ import com.cloud.userservice.dto.SignInRequest;
 import com.cloud.userservice.dto.SignUpRequest;
 import com.cloud.userservice.dto.UserDetailDto;
 import com.cloud.userservice.exception.CustomException;
-import com.cloud.userservice.model.AuthModel;
+import com.cloud.userservice.model.UserModel;
 import com.cloud.userservice.model.Role;
 import com.cloud.userservice.model.UserDetail;
 import com.cloud.userservice.repository.UserRepository;
@@ -61,7 +61,7 @@ public class AuthServiceTest extends PostgresTestContainer {
         public void should_save_user_as_active_in_user_db() {
             SignUpRequest signUpRequest = new SignUpRequest(new UserDetailDto(), "user@email.com", "password", "password");
             authService.signUp(signUpRequest);
-            Optional<AuthModel> byEmail = userRepository.findByEmail(signUpRequest.getEmail());
+            Optional<UserModel> byEmail = userRepository.findByEmail(signUpRequest.getEmail());
             assertTrue(byEmail.isPresent());
             assertTrue(byEmail.get().getActive());
         }
@@ -69,7 +69,7 @@ public class AuthServiceTest extends PostgresTestContainer {
 
         @Test
         void should_check_for_existing_email() {
-            userRepository.save(new AuthModel(new UserDetail("fn","ln"), "userExist@email.com", "1212"));
+            userRepository.save(new UserModel(new UserDetail("fn","ln"), "userExist@email.com", "1212"));
             SignUpRequest signUpRequest = new SignUpRequest(new UserDetailDto(), "userExist@email.com", "password", "password");
             CustomException customException = assertThrows(CustomException.class, () -> authService.signUp(signUpRequest));
             assertEquals("email already exists", customException.getMessage());
@@ -86,7 +86,7 @@ public class AuthServiceTest extends PostgresTestContainer {
         void should_save_the_password_in_encrypted_form_in_DB() {
             SignUpRequest signUpRequest = new SignUpRequest(new UserDetailDto(), "user@email.com", "password", "password");
             authService.signUp(signUpRequest);
-            Optional<AuthModel> byEmail = userRepository.findByEmail(signUpRequest.getEmail());
+            Optional<UserModel> byEmail = userRepository.findByEmail(signUpRequest.getEmail());
             assertTrue(passwordEncoder.matches(signUpRequest.getPassword(), byEmail.isPresent() ? byEmail.get().getPassword() : ""));
         }
 
@@ -106,7 +106,7 @@ public class AuthServiceTest extends PostgresTestContainer {
         void should_give_the_new_user_user_role_when_sign_up() {
             SignUpRequest signUpRequest = new SignUpRequest(new UserDetailDto(), "user@email.com", "password", "password");
             authService.signUp(signUpRequest);
-            Optional<AuthModel> byEmail = userRepository.findByEmail(signUpRequest.getEmail());
+            Optional<UserModel> byEmail = userRepository.findByEmail(signUpRequest.getEmail());
             assertTrue(byEmail.isPresent());
             Role roles = byEmail.get().getRole();
             assertEquals(Role.USER, roles);
@@ -122,7 +122,7 @@ public class AuthServiceTest extends PostgresTestContainer {
             String email = "user@email.com";
             String encodeedPassword = passwordEncoder.encode("Pass@1234");
             String password = "Pass@1234";
-            userRepository.save(new AuthModel(userDetail, email, encodeedPassword));
+            userRepository.save(new UserModel(userDetail, email, encodeedPassword));
             SignInRequest signInRequest = new SignInRequest(email, password);
             AuthResponse signInResponse = authService.signIn(signInRequest);
             assertNotNull(signInResponse.getToken());
@@ -141,7 +141,7 @@ public class AuthServiceTest extends PostgresTestContainer {
         void should_give_error_when_the_password_is_wrong() {
             String email = "user@email.com";
             String password = passwordEncoder.encode("Pass@1234");
-            userRepository.save(new AuthModel( new UserDetail("fn","ln"), email, password));
+            userRepository.save(new UserModel( new UserDetail("fn","ln"), email, password));
             SignInRequest signInRequest = new SignInRequest(email, "wrongPassword");
             CustomException customException = assertThrows(CustomException.class, () -> authService.signIn(signInRequest));
             assertEquals("Email or password is wrong", customException.getMessage());
@@ -152,13 +152,13 @@ public class AuthServiceTest extends PostgresTestContainer {
             String email = "user@email.com";
             String password = "Pass@1234";
             String encodedPassword = passwordEncoder.encode(password);
-            AuthModel authModel = userRepository.save(new AuthModel(new UserDetail("fn","ln"), email, encodedPassword));
+            UserModel userModel = userRepository.save(new UserModel(new UserDetail("fn","ln"), email, encodedPassword));
             SignInRequest signInRequest = new SignInRequest(email, password);
             AuthResponse authResponse = authService.signIn(signInRequest);
             String token = authResponse.getToken();
             Claims claims = jwtService.decodeJWT(token);
-            assertEquals(authModel.getId().toString(), claims.getId());
-            assertEquals(authModel.getEmail(), claims.getIssuer());
+            assertEquals(userModel.getId().toString(), claims.getId());
+            assertEquals(userModel.getEmail(), claims.getIssuer());
             assertEquals("USER", claims.getSubject());
         }
     }

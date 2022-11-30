@@ -4,7 +4,7 @@ import com.cloud.userservice.dto.AddressDto;
 import com.cloud.userservice.dto.ContactDto;
 import com.cloud.userservice.dto.UserDetailDto;
 import com.cloud.userservice.exception.CustomException;
-import com.cloud.userservice.model.AuthModel;
+import com.cloud.userservice.model.UserModel;
 import com.cloud.userservice.repository.UserRepository;
 import com.cloud.userservice.testUtils.PostgresTestContainer;
 import com.cloud.userservice.util.ErrorMessages;
@@ -33,8 +33,8 @@ class UserServiceTest extends PostgresTestContainer {
 
     @BeforeEach
     void setUp() {
-        AuthModel authModel1=userRepository.save(authModel);
-        id = authModel1.getId();
+        UserModel userModel1 =userRepository.save(userModel);
+        id = userModel1.getId();
     }
 
     @Nested

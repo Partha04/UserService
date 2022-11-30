@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AuthModel implements Serializable {
+public class UserModel implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,7 +28,7 @@ public class AuthModel implements Serializable {
 
     private Role role = Role.USER;
 
-    public AuthModel(UserDetail userDetail, String email, String password) {
+    public UserModel(UserDetail userDetail, String email, String password) {
         this.userDetail = userDetail;
         this.email = email;
         this.password = password;

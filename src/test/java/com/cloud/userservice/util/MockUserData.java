@@ -19,7 +19,7 @@ public class MockUserData {
     public static String district = "user district";
     public static String countryCode = "+91";
     public static String contactValue = "7411122233";
-    public static AuthModel authModel = new AuthModel();
+    public static UserModel userModel = new UserModel();
     public static boolean active = true;
     public static String userEmail = "user@example.com";
     public static String password = "demopassword";
@@ -65,10 +65,10 @@ public class MockUserData {
         userContacts.add(contact);
         userDetail.setContacts(userContacts);
 
-        authModel.setUserDetail(userDetail);
-        authModel.setRole(Role.USER);
-        authModel.setActive(active);
-        authModel.setEmail(userEmail);
-        authModel.setPassword(password);
+        userModel.setUserDetail(userDetail);
+        userModel.setRole(Role.USER);
+        userModel.setActive(active);
+        userModel.setEmail(userEmail);
+        userModel.setPassword(password);
     }
 }
